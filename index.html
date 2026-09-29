@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Khazuriel AI - Institutional SMC & Trading Mentor</title>
     
     <!-- Tailwind CSS CDN -->
@@ -17,21 +17,30 @@
     <style>
         :root {
             --bg-dark: #030712;
-            --card-bg: rgba(13, 20, 36, 0.75);
-            --border-color: rgba(59, 130, 246, 0.2);
+            --card-bg: rgba(13, 20, 36, 0.85);
+            --border-color: rgba(59, 130, 246, 0.25);
             --cyan-glow: rgba(6, 182, 212, 0.5);
             --gold-glow: rgba(234, 179, 8, 0.5);
         }
 
-        body {
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             background-color: var(--bg-dark);
             color: #f3f4f6;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15), transparent 50%),
                 radial-gradient(circle at 0% 100%, rgba(234, 179, 8, 0.05), transparent 40%);
             background-attachment: fixed;
-            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Glassmorphism Styles */
@@ -44,8 +53,8 @@
         }
 
         .glass-input {
-            background: rgba(3, 7, 18, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(3, 7, 18, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #ffffff;
         }
 
@@ -57,8 +66,8 @@
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(3, 7, 18, 0.5);
@@ -66,9 +75,6 @@
         ::-webkit-scrollbar-thumb {
             background: rgba(59, 130, 246, 0.3);
             border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(59, 130, 246, 0.6);
         }
 
         /* Quantum Core Canvas Overlay */
@@ -83,17 +89,17 @@
         }
 
         /* Markdown Formatting inside Chat */
-        .chat-content p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .chat-content p { margin-bottom: 0.5rem; line-height: 1.5; }
         .chat-content p:last-child { margin-bottom: 0; }
-        .chat-content ul, .chat-content ol { margin-left: 1.25rem; margin-bottom: 0.75rem; list-style-type: disc; }
+        .chat-content ul, .chat-content ol { margin-left: 1.25rem; margin-bottom: 0.5rem; list-style-type: disc; }
         .chat-content strong { color: #38bdf8; font-weight: 600; }
         
         /* Markdown Tables */
         .chat-content table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1rem 0;
-            font-size: 0.875rem;
+            margin: 0.75rem 0;
+            font-size: 0.8rem;
             background: rgba(15, 23, 42, 0.6);
             border-radius: 8px;
             overflow: hidden;
@@ -102,56 +108,58 @@
         .chat-content th {
             background: rgba(30, 58, 138, 0.4);
             color: #38bdf8;
-            padding: 0.6rem 0.8rem;
+            padding: 0.5rem 0.6rem;
             text-align: left;
             font-weight: 600;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .chat-content td {
-            padding: 0.5rem 0.8rem;
+            padding: 0.4rem 0.6rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         .chat-content tr:last-child td { border-bottom: none; }
         .chat-content tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
 
-        /* Pulse Animations */
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
+        /* Voice Pulse Recording Animation */
+        @keyframes pulseRecord {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
         }
-        .core-glow {
-            animation: pulseGlow 4s infinite ease-in-out;
+        .recording-active {
+            animation: pulseRecord 1.5s infinite;
+            background-color: #ef4444 !important;
+            border-color: #f87171 !important;
         }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden text-sm md:text-base">
+<body class="text-sm">
 
     <!-- Header Section -->
-    <header class="glass-panel z-10 px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+    <header class="glass-panel z-10 px-4 py-2.5 border-b border-gray-800 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
-            <div class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-blue-950/50 border border-blue-500/30 overflow-hidden">
+            <div class="relative w-9 h-9 flex items-center justify-center rounded-xl bg-blue-950/50 border border-blue-500/30 overflow-hidden">
                 <canvas id="quantum-canvas"></canvas>
-                <i data-lucide="cpu" class="w-5 h-5 text-cyan-400 z-10"></i>
+                <i data-lucide="cpu" class="w-4 h-4 text-cyan-400 z-10"></i>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="font-bold text-base tracking-wide bg-gradient-to-r from-cyan-400 via-blue-400 to-amber-300 bg-clip-text text-transparent">
+                    <h1 class="font-bold text-sm tracking-wide bg-gradient-to-r from-cyan-400 via-blue-400 to-amber-300 bg-clip-text text-transparent">
                         KHAZURIEL AI
                     </h1>
-                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-cyan-400 border border-cyan-500/20 font-mono">
-                        PRO v3.2
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/10 text-cyan-400 border border-cyan-500/20 font-mono">
+                        PRO v3.3
                     </span>
                 </div>
-                <p class="text-xs text-gray-400">Institutional SMC & Quantitative Trading Mentor</p>
+                <p class="text-[10px] text-gray-400">Institutional SMC Trading Mentor</p>
             </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <button id="toggle-key-btn" title="Configurar API Key" class="p-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700 text-gray-300 hover:text-white transition relative">
+            <button id="toggle-key-btn" title="Configurar API Key" class="p-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700 text-gray-300 transition relative">
                 <i data-lucide="key" class="w-4 h-4"></i>
                 <span id="key-status-dot" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 border border-gray-900"></span>
             </button>
-            <button id="clear-chat-btn" title="Limpar Conversa" class="p-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700 text-gray-300 hover:text-white transition">
+            <button id="clear-chat-btn" title="Limpar Conversa" class="p-2 rounded-lg bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700 text-gray-300 transition">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
         </div>
@@ -159,61 +167,64 @@
 
     <!-- Key Modal Configuration -->
     <div id="key-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="glass-panel w-full max-w-md p-6 rounded-2xl border border-blue-500/30 shadow-2xl relative">
-            <h2 class="text-lg font-bold text-cyan-400 mb-2 flex items-center gap-2">
+        <div class="glass-panel w-full max-w-md p-5 rounded-2xl border border-blue-500/30 shadow-2xl relative">
+            <h2 class="text-base font-bold text-cyan-400 mb-2 flex items-center gap-2">
                 <i data-lucide="shield-check" class="w-5 h-5"></i> Configurar Chave OpenRouter
             </h2>
             <p class="text-xs text-gray-400 mb-4">
-                Cole a sua chave API abaixo. Ela fica salva de forma 100% privada no seu telemóvel e nunca é enviada para o GitHub.
+                Cole a sua chave API abaixo. Ela fica salva no telemóvel e nunca é exposta publicamente.
             </p>
             <input type="password" id="api-key-input" placeholder="Cole a sua chave (sk-or-v1-...)" class="w-full glass-input p-3 rounded-xl mb-4 font-mono text-xs">
             <div class="flex justify-end gap-2">
-                <button id="close-key-modal" class="px-4 py-2 rounded-xl text-xs bg-gray-800 hover:bg-gray-700 text-gray-300">
+                <button id="close-key-modal" class="px-4 py-2 rounded-xl text-xs bg-gray-800 text-gray-300">
                     Cancelar
                 </button>
-                <button id="save-key-btn" class="px-4 py-2 rounded-xl text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold">
+                <button id="save-key-btn" class="px-4 py-2 rounded-xl text-xs bg-blue-600 text-white font-semibold">
                     Salvar e Ativar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative z-10">
-        
-        <!-- Chat Display Window -->
-        <section class="flex-1 flex flex-col h-full overflow-hidden">
-            <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4">
-                <!-- System Welcome Message -->
-                <div class="flex gap-3 max-w-3xl">
-                    <div class="w-8 h-8 rounded-lg bg-blue-900/40 border border-blue-500/30 flex items-center justify-center shrink-0">
-                        <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i>
-                    </div>
-                    <div class="glass-panel p-4 rounded-2xl rounded-tl-none text-gray-200 chat-content border border-blue-500/20">
-                        <p><strong>Saudações Operacionais. Sou Khazuriel AI.</strong></p>
-                        <p>Estou pronto para analisar configurações institucionais de mercado, métricas de <strong>Smart Money Concepts (SMC)</strong>, estruturas de <strong>ICT</strong>, liquidez, e gestão quantitativa de risco.</p>
-                        <div id="welcome-key-alert" class="mt-2 text-xs text-amber-400 font-mono">
-                            ⚠️ Por favor, clique no ícone da chave 🔑 no topo para ativar a sua API Key do OpenRouter.
-                        </div>
+    <!-- Main Chat Window Area -->
+    <main class="flex-1 flex flex-col min-h-0 relative z-10 overflow-hidden">
+        <div id="chat-box" class="flex-1 overflow-y-auto p-3 space-y-3">
+            <!-- Initial Welcome Message -->
+            <div class="flex gap-2.5 max-w-3xl">
+                <div class="w-7 h-7 rounded-lg bg-blue-900/40 border border-blue-500/30 flex items-center justify-center shrink-0 mt-1">
+                    <i data-lucide="bot" class="w-3.5 h-3.5 text-cyan-400"></i>
+                </div>
+                <div class="glass-panel p-3.5 rounded-2xl rounded-tl-none text-gray-200 chat-content border border-blue-500/20 text-xs md:text-sm">
+                    <p><strong>Saudações Operacionais. Sou Khazuriel AI.</strong></p>
+                    <p>Pronto para analisar configurações institucionais, métricas de <strong>SMC</strong>, blocos de ordens e liquidez.</p>
+                    <div id="welcome-key-alert" class="mt-2 text-[11px] font-mono text-cyan-400/80">
+                        ⚡ Status: Núcleo Quântico Conectado e Pronto.
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Input Controls Area -->
-            <div class="p-3 glass-panel border-t border-gray-800 m-2 rounded-2xl">
-                <form id="chat-form" class="flex items-center gap-2">
-                    <input type="text" id="user-input" placeholder="Pergunte sobre SMC, Order Blocks, Liquidez ou solicite um plano..." class="flex-1 glass-input py-3 px-4 rounded-xl text-sm placeholder-gray-500 focus:outline-none">
-                    <button type="submit" id="send-btn" class="p-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl shadow-lg transition flex items-center justify-center shrink-0">
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                    </button>
-                </form>
-            </div>
-        </section>
+        <!-- Optimized Bottom Input Controls Bar (No Clipping) -->
+        <div class="p-2.5 glass-panel border-t border-gray-800/80 shrink-0 m-1.5 rounded-xl pb-safe">
+            <form id="chat-form" class="flex items-center gap-1.5">
+                <!-- Voice Recording Mic Button -->
+                <button type="button" id="mic-btn" title="Falar por voz" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-cyan-400 transition flex items-center justify-center shrink-0">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Text Input -->
+                <input type="text" id="user-input" placeholder="Digite ou fale sua análise de mercado..." class="flex-1 glass-input py-2.5 px-3 rounded-xl text-xs md:text-sm placeholder-gray-500 focus:outline-none min-w-0">
+                
+                <!-- Send Button -->
+                <button type="submit" id="send-btn" class="p-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl shadow-lg transition flex items-center justify-center shrink-0">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
     </main>
 
     <!-- JavaScript Application Logic -->
     <script>
-        // System Persona Definition
         const KHAZURIEL_SYSTEM_PROMPT = `Você é Khazuriel AI, um mentor e especialista em negociação institucional no mercado financeiro (Forex, Cripto e Índices).
 Você é um especialista absoluto em Smart Money Concepts (SMC), metodologia ICT (Inner Circle Trader), análise de liquidez (Sweep/Grab), blocos de ordens (Order Blocks/OB), Fair Value Gaps (FVG) e mitigação.
 
@@ -223,10 +234,10 @@ DIRETRIZES DE RESPOSTA:
 3. Seja prático e direto nas análises operacionais.
 4. Responda em Português.`;
 
-        // DOM Element References
         const chatBox = document.getElementById('chat-box');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
+        const micBtn = document.getElementById('mic-btn');
         const clearChatBtn = document.getElementById('clear-chat-btn');
         const toggleKeyBtn = document.getElementById('toggle-key-btn');
         const keyModal = document.getElementById('key-modal');
@@ -236,7 +247,6 @@ DIRETRIZES DE RESPOSTA:
         const keyStatusDot = document.getElementById('key-status-dot');
         const welcomeKeyAlert = document.getElementById('welcome-key-alert');
 
-        // Check and Load Storage API Key
         let openRouterKey = localStorage.getItem('khazuriel_openrouter_key') || '';
 
         function updateKeyUI() {
@@ -244,7 +254,7 @@ DIRETRIZES DE RESPOSTA:
                 apiKeyInput.value = openRouterKey;
                 keyStatusDot.className = "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-gray-900";
                 if (welcomeKeyAlert) {
-                    welcomeKeyAlert.className = "mt-2 text-xs text-cyan-400/80 font-mono";
+                    welcomeKeyAlert.className = "mt-2 text-[11px] font-mono text-cyan-400/80";
                     welcomeKeyAlert.innerHTML = "⚡ Status: Núcleo Quântico Conectado e Pronto.";
                 }
             } else {
@@ -253,10 +263,7 @@ DIRETRIZES DE RESPOSTA:
         }
         updateKeyUI();
 
-        // Message History State
-        let messageHistory = [
-            { role: "system", content: KHAZURIEL_SYSTEM_PROMPT }
-        ];
+        let messageHistory = [{ role: "system", content: KHAZURIEL_SYSTEM_PROMPT }];
 
         // UI Modal Logic
         toggleKeyBtn.addEventListener('click', () => keyModal.classList.remove('hidden'));
@@ -268,21 +275,18 @@ DIRETRIZES DE RESPOSTA:
                 localStorage.setItem('khazuriel_openrouter_key', key);
                 updateKeyUI();
                 keyModal.classList.add('hidden');
-                alert('Chave API ativada e guardada no seu telemóvel!');
-            } else {
-                alert('Por favor, introduza uma chave válida.');
             }
         });
 
-        // Clear Chat Logic
+        // Clear Chat
         clearChatBtn.addEventListener('click', () => {
             messageHistory = [{ role: "system", content: KHAZURIEL_SYSTEM_PROMPT }];
             chatBox.innerHTML = `
-                <div class="flex gap-3 max-w-3xl">
-                    <div class="w-8 h-8 rounded-lg bg-blue-900/40 border border-blue-500/30 flex items-center justify-center shrink-0">
-                        <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i>
+                <div class="flex gap-2.5 max-w-3xl">
+                    <div class="w-7 h-7 rounded-lg bg-blue-900/40 border border-blue-500/30 flex items-center justify-center shrink-0 mt-1">
+                        <i data-lucide="bot" class="w-3.5 h-3.5 text-cyan-400"></i>
                     </div>
-                    <div class="glass-panel p-4 rounded-2xl rounded-tl-none text-gray-200 chat-content border border-blue-500/20">
+                    <div class="glass-panel p-3.5 rounded-2xl rounded-tl-none text-gray-200 chat-content border border-blue-500/20 text-xs md:text-sm">
                         <p><strong>Conversa reiniciada.</strong> Como posso ajudar na sua próxima análise de mercado?</p>
                     </div>
                 </div>
@@ -290,18 +294,66 @@ DIRETRIZES DE RESPOSTA:
             lucide.createIcons();
         });
 
-        // Append Message to UI Display
+        // Speech Recognition Setup
+        let isRecording = false;
+        let recognition = null;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                micBtn.classList.add('recording-active');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                userInput.value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech error:', event.error);
+                stopRecording();
+            };
+
+            recognition.onend = () => {
+                stopRecording();
+            };
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            micBtn.classList.remove('recording-active');
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (!recognition) {
+                alert('O seu navegador não suporta reconhecimento de voz.');
+                return;
+            }
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
+        // Append Message
         function appendMessage(role, text) {
             const isUser = role === 'user';
             const msgContainer = document.createElement('div');
-            msgContainer.className = `flex gap-3 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : ''}`;
+            msgContainer.className = `flex gap-2.5 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : ''}`;
 
             const avatar = document.createElement('div');
-            avatar.className = `w-8 h-8 rounded-lg ${isUser ? 'bg-amber-600/30 border border-amber-500/30' : 'bg-blue-900/40 border border-blue-500/30'} flex items-center justify-center shrink-0`;
-            avatar.innerHTML = `<i data-lucide="${isUser ? 'user' : 'bot'}" class="w-4 h-4 ${isUser ? 'text-amber-400' : 'text-cyan-400'}"></i>`;
+            avatar.className = `w-7 h-7 rounded-lg ${isUser ? 'bg-amber-600/30 border border-amber-500/30' : 'bg-blue-900/40 border border-blue-500/30'} flex items-center justify-center shrink-0 mt-1`;
+            avatar.innerHTML = `<i data-lucide="${isUser ? 'user' : 'bot'}" class="w-3.5 h-3.5 ${isUser ? 'text-amber-400' : 'text-cyan-400'}"></i>`;
 
             const bubble = document.createElement('div');
-            bubble.className = `glass-panel p-4 rounded-2xl ${isUser ? 'rounded-tr-none border-amber-500/20 bg-amber-950/20' : 'rounded-tl-none border-blue-500/20'} text-gray-200 chat-content`;
+            bubble.className = `glass-panel p-3.5 rounded-2xl ${isUser ? 'rounded-tr-none border-amber-500/20 bg-amber-950/20' : 'rounded-tl-none border-blue-500/20'} text-gray-200 chat-content text-xs md:text-sm`;
             
             if (isUser) {
                 bubble.textContent = text;
@@ -318,16 +370,15 @@ DIRETRIZES DE RESPOSTA:
             return bubble;
         }
 
-        // Show Typing Indicator
         function createTypingIndicator() {
             const msgContainer = document.createElement('div');
             msgContainer.id = 'typing-indicator';
-            msgContainer.className = 'flex gap-3 max-w-3xl';
+            msgContainer.className = 'flex gap-2.5 max-w-3xl';
             msgContainer.innerHTML = `
-                <div class="w-8 h-8 rounded-lg bg-blue-900/40 border border-blue-500/30 flex items-center justify-center shrink-0">
-                    <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i>
+                <div class="w-7 h-7 rounded-lg bg-blue-900/40 border border-blue-500/30 flex items-center justify-center shrink-0 mt-1">
+                    <i data-lucide="bot" class="w-3.5 h-3.5 text-cyan-400"></i>
                 </div>
-                <div class="glass-panel p-4 rounded-2xl rounded-tl-none text-gray-400 text-xs flex items-center gap-2 border border-blue-500/20">
+                <div class="glass-panel p-3 rounded-2xl rounded-tl-none text-gray-400 text-xs flex items-center gap-2 border border-blue-500/20">
                     <span class="animate-pulse">Analisando estrutura de mercado...</span>
                 </div>
             `;
@@ -341,7 +392,7 @@ DIRETRIZES DE RESPOSTA:
             if (indicator) indicator.remove();
         }
 
-        // Handle Chat Form Submission
+        // Chat Form Handler
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = userInput.value.trim();
@@ -389,11 +440,11 @@ DIRETRIZES DE RESPOSTA:
 
             } catch (err) {
                 removeTypingIndicator();
-                appendMessage('assistant', `⚠️ **Erro de Conexão**: ${err.message}. Clique no ícone de chave no topo para verificar se a sua chave do OpenRouter está ativa.`);
+                appendMessage('assistant', `⚠️ **Erro de Conexão**: ${err.message}. Clique no ícone de chave no topo para verificar a sua API Key.`);
             }
         });
 
-        // Initialize Quantum Canvas Background Effect
+        // Quantum Canvas Background
         const canvas = document.getElementById('quantum-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -404,11 +455,11 @@ DIRETRIZES DE RESPOSTA:
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        let particles = Array.from({ length: 15 }, () => ({
+        let particles = Array.from({ length: 12 }, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: (Math.random() - 0.5) * 0.5,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
             radius: Math.random() * 1.5 + 0.5
         }));
 
@@ -432,7 +483,6 @@ DIRETRIZES DE RESPOSTA:
         }
         animateCanvas();
 
-        // Initialize Lucide Icons
         lucide.createIcons();
     </script>
 </body>
