@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Khazuriel AI - Institutional SMC & Trading Mentor</title>
     
     <!-- Tailwind CSS CDN -->
@@ -17,10 +17,8 @@
     <style>
         :root {
             --bg-dark: #030712;
-            --card-bg: rgba(13, 20, 36, 0.85);
+            --card-bg: rgba(13, 20, 36, 0.90);
             --border-color: rgba(59, 130, 246, 0.25);
-            --cyan-glow: rgba(6, 182, 212, 0.5);
-            --gold-glow: rgba(234, 179, 8, 0.5);
         }
 
         html, body {
@@ -49,43 +47,35 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
 
         .glass-input {
-            background: rgba(3, 7, 18, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(3, 7, 18, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
         }
 
         .glass-input:focus {
             border-color: #3b82f6;
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
             outline: none;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(3, 7, 18, 0.5);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(59, 130, 246, 0.3);
-            border-radius: 3px;
+        /* Safe area bottom padding for Android gesture bar */
+        .bottom-safe-area {
+            padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));
         }
 
-        /* Quantum Core Canvas Overlay */
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(3, 7, 18, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 3px; }
+
         #quantum-canvas {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
         }
 
         /* Markdown Formatting inside Chat */
@@ -94,33 +84,17 @@
         .chat-content ul, .chat-content ol { margin-left: 1.25rem; margin-bottom: 0.5rem; list-style-type: disc; }
         .chat-content strong { color: #38bdf8; font-weight: 600; }
         
-        /* Markdown Tables */
         .chat-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0.75rem 0;
-            font-size: 0.8rem;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 8px;
-            overflow: hidden;
+            width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.8rem;
+            background: rgba(15, 23, 42, 0.6); border-radius: 8px; overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .chat-content th {
-            background: rgba(30, 58, 138, 0.4);
-            color: #38bdf8;
-            padding: 0.5rem 0.6rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 58, 138, 0.4); color: #38bdf8; padding: 0.5rem 0.6rem;
+            text-align: left; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .chat-content td {
-            padding: 0.4rem 0.6rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .chat-content tr:last-child td { border-bottom: none; }
-        .chat-content tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+        .chat-content td { padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-        /* Voice Pulse Recording Animation */
         @keyframes pulseRecord {
             0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -147,7 +121,7 @@
                         KHAZURIEL AI
                     </h1>
                     <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/10 text-cyan-400 border border-cyan-500/20 font-mono">
-                        PRO v3.3
+                        PRO v3.4
                     </span>
                 </div>
                 <p class="text-[10px] text-gray-400">Institutional SMC Trading Mentor</p>
@@ -204,19 +178,19 @@
             </div>
         </div>
 
-        <!-- Optimized Bottom Input Controls Bar (No Clipping) -->
-        <div class="p-2.5 glass-panel border-t border-gray-800/80 shrink-0 m-1.5 rounded-xl pb-safe">
-            <form id="chat-form" class="flex items-center gap-1.5">
+        <!-- Raised Input Controls Bar for Android Gesture Navigation -->
+        <div class="px-3 pt-2 bottom-safe-area mb-4 glass-panel border-t border-gray-800/80 shrink-0 mx-2 rounded-2xl">
+            <form id="chat-form" class="flex items-center gap-2">
                 <!-- Voice Recording Mic Button -->
-                <button type="button" id="mic-btn" title="Falar por voz" class="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-cyan-400 transition flex items-center justify-center shrink-0">
+                <button type="button" id="mic-btn" title="Falar por voz" class="p-3 rounded-xl bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-cyan-400 transition flex items-center justify-center shrink-0">
                     <i data-lucide="mic" class="w-4 h-4"></i>
                 </button>
 
                 <!-- Text Input -->
-                <input type="text" id="user-input" placeholder="Digite ou fale sua análise de mercado..." class="flex-1 glass-input py-2.5 px-3 rounded-xl text-xs md:text-sm placeholder-gray-500 focus:outline-none min-w-0">
+                <input type="text" id="user-input" placeholder="Digite ou fale sua análise..." class="flex-1 glass-input py-3 px-3 rounded-xl text-xs md:text-sm placeholder-gray-400 focus:outline-none min-w-0">
                 
                 <!-- Send Button -->
-                <button type="submit" id="send-btn" class="p-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl shadow-lg transition flex items-center justify-center shrink-0">
+                <button type="submit" id="send-btn" class="p-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl shadow-lg transition flex items-center justify-center shrink-0">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </form>
@@ -229,7 +203,7 @@
 Você é um especialista absoluto em Smart Money Concepts (SMC), metodologia ICT (Inner Circle Trader), análise de liquidez (Sweep/Grab), blocos de ordens (Order Blocks/OB), Fair Value Gaps (FVG) e mitigação.
 
 DIRETRIZES DE RESPOSTA:
-1. Adote uma postura profissional, analítica, cirúrgica e altamente confiante.
+1. Adote uma postura profissional, analítica, cirúrgica e highly confident.
 2. Formate suas respostas usando Markdown rico (tabelas para comparações e métricas de risco, negrito para termos técnicos, listas detalhadas).
 3. Seja prático e direto nas análises operacionais.
 4. Responda em Português.`;
@@ -265,7 +239,6 @@ DIRETRIZES DE RESPOSTA:
 
         let messageHistory = [{ role: "system", content: KHAZURIEL_SYSTEM_PROMPT }];
 
-        // UI Modal Logic
         toggleKeyBtn.addEventListener('click', () => keyModal.classList.remove('hidden'));
         closeKeyModal.addEventListener('click', () => keyModal.classList.add('hidden'));
         saveKeyBtn.addEventListener('click', () => {
@@ -278,7 +251,6 @@ DIRETRIZES DE RESPOSTA:
             }
         });
 
-        // Clear Chat
         clearChatBtn.addEventListener('click', () => {
             messageHistory = [{ role: "system", content: KHAZURIEL_SYSTEM_PROMPT }];
             chatBox.innerHTML = `
@@ -315,14 +287,8 @@ DIRETRIZES DE RESPOSTA:
                 userInput.value = transcript;
             };
 
-            recognition.onerror = (event) => {
-                console.error('Speech error:', event.error);
-                stopRecording();
-            };
-
-            recognition.onend = () => {
-                stopRecording();
-            };
+            recognition.onerror = () => stopRecording();
+            recognition.onend = () => stopRecording();
         }
 
         function stopRecording() {
@@ -342,7 +308,6 @@ DIRETRIZES DE RESPOSTA:
             }
         });
 
-        // Append Message
         function appendMessage(role, text) {
             const isUser = role === 'user';
             const msgContainer = document.createElement('div');
@@ -392,7 +357,6 @@ DIRETRIZES DE RESPOSTA:
             if (indicator) indicator.remove();
         }
 
-        // Chat Form Handler
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = userInput.value.trim();
@@ -440,7 +404,7 @@ DIRETRIZES DE RESPOSTA:
 
             } catch (err) {
                 removeTypingIndicator();
-                appendMessage('assistant', `⚠️ **Erro de Conexão**: ${err.message}. Clique no ícone de chave no topo para verificar a sua API Key.`);
+                appendMessage('assistant', `⚠️ **Erro de Conexão**: ${err.message}. Clique na chave no topo para verificar sua API Key.`);
             }
         });
 
@@ -468,12 +432,9 @@ DIRETRIZES DE RESPOSTA:
             ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
 
             particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-
+                p.x += p.vx; p.y += p.vy;
                 if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                 if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                 ctx.fill();
